@@ -1,4 +1,4 @@
-package main
+package xsock
 
 import (
 	"log"
@@ -11,7 +11,7 @@ type Config struct {
 	ByteBufferSize uint64
 	// Use this byte two times at the end of each segment two times sequentially. Default: ETX 0x03
 	ETXCode          uint8
-	// Set true to remove socket file at start and end of the connection
+	// Set true to remove socket file at start of the connection
 	AutoRemoveSocket bool
 }
 
@@ -19,7 +19,7 @@ type Server struct {
 	config *Config
 }
 
-func CreateServer(config *Config) *Server {
+func CreateXSockServer(config *Config) *Server {
 	if config.ByteBufferSize == 0 {
 		config.ByteBufferSize = 1024
 	}
@@ -70,15 +70,15 @@ func (s *Server) connectionHandler(conn *net.UnixConn, resultChan *chan []byte) 
 }
 
 func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byte, error) {
+	if s.config.AutoRemoveSocket {
+		os.Remove(socketAddress)
+	}
 	resultChan := make(chan []byte, channelBufferSize)
 	sockAddr := &net.UnixAddr{
 		Name: socketAddress,
 		Net:  "unix",
 	}
-	if s.config.AutoRemoveSocket {
-		os.Remove(socketAddress)
-		defer os.Remove(socketAddress)
-	}
+
 
 	l, err := net.ListenUnix("unix", sockAddr)
 

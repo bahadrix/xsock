@@ -1,4 +1,4 @@
-package main
+package xsock
 
 import (
 	"fmt"
@@ -32,7 +32,7 @@ func pusher(name string, msgCount int) {
 func TestServer(t *testing.T) {
 
 
-	socketServer := CreateServer(&Config{
+	socketServer := CreateXSockServer(&Config{
 		ByteBufferSize:   1024,
 		ETXCode:          0x03,
 		AutoRemoveSocket: true,

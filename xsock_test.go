@@ -1,4 +1,4 @@
-package xsock
+package xsock_test
 
 import (
 	"fmt"

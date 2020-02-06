@@ -98,3 +98,4 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 
 	return resultChan, nil
 }
+

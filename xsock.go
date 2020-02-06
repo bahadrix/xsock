@@ -10,7 +10,7 @@ type Config struct {
 	// Default is 1024 byte
 	ByteBufferSize uint64
 	// Use this byte two times at the end of each segment two times sequentially. Default: ETX 0x03
-	ETXCode          uint8
+	ETXCode uint8
 	// Set true to remove socket file at start of the connection
 	AutoRemoveSocket bool
 }
@@ -45,7 +45,7 @@ func (s *Server) connectionHandler(conn *net.UnixConn, resultChan *chan []byte) 
 		if err != nil {
 			if opErr, ok := err.(*net.OpError); ok {
 				if opErr.Err.Error() == "EOF" {
-					// May be the connection is closed
+					// Maybe the connection is closed
 					break
 				}
 			}
@@ -79,7 +79,6 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 		Net:  "unix",
 	}
 
-
 	l, err := net.ListenUnix("unix", sockAddr)
 
 	if err != nil {
@@ -98,4 +97,3 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 
 	return resultChan, nil
 }
-

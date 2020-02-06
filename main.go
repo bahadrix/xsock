@@ -1,5 +1,0 @@
-package xsock
-
-func main() {
-	
-}

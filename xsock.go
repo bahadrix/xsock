@@ -19,6 +19,14 @@ type Server struct {
 	config *Config
 }
 
+type ListenerController struct {
+	listener *net.UnixListener
+}
+
+func (c *ListenerController) Close() error {
+	return c.listener.Close()
+}
+
 func CreateXSockServer(config *Config) *Server {
 	if config.ByteBufferSize == 0 {
 		config.ByteBufferSize = 1024
@@ -69,7 +77,7 @@ func (s *Server) connectionHandler(conn *net.UnixConn, resultChan *chan []byte) 
 
 }
 
-func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byte, error) {
+func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byte, *ListenerController, error) {
 	if s.config.AutoRemoveSocket {
 		os.Remove(socketAddress)
 	}
@@ -82,8 +90,10 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 	l, err := net.ListenUnix("unix", sockAddr)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+
+	lcont := &ListenerController{listener:l}
 
 	go func() {
 		for {
@@ -92,8 +102,10 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 				log.Printf("Error on accepting connection: %v", err)
 			}
 			go s.connectionHandler(conn, &resultChan)
+
 		}
 	}()
 
-	return resultChan, nil
+	return resultChan, lcont, nil
 }
+

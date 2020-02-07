@@ -100,10 +100,11 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 	go func() {
 		for {
 			conn, err := l.AcceptUnix()
-			if lcont.isClosing {
-				break
-			}
+
 			if err != nil {
+				if lcont.isClosing {
+					break
+				}
 				log.Printf("Error on accepting connection: %v", err)
 			}
 			go s.connectionHandler(conn, &resultChan)

@@ -21,9 +21,11 @@ type Server struct {
 
 type ListenerController struct {
 	listener *net.UnixListener
+	isClosing bool
 }
 
 func (c *ListenerController) Close() error {
+	c.isClosing = true
 	return c.listener.Close()
 }
 
@@ -98,6 +100,9 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 	go func() {
 		for {
 			conn, err := l.AcceptUnix()
+			if lcont.isClosing {
+				break
+			}
 			if err != nil {
 				log.Printf("Error on accepting connection: %v", err)
 			}

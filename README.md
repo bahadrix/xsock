@@ -12,4 +12,4 @@ go get -u github.com/bahadrix/xsock
 ```
 
 ### Usage
-See server_test.go for usage.
+See [xsock_test.go](xsock_test.go) for usage.

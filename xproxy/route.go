@@ -4,6 +4,7 @@ import (
 	"github.com/bahadrix/xsock"
 	"log"
 	"net"
+	"os"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type RouteConfig struct {
 	RoutePackBufferSize      int
 	ReceiverPackBufferSize   int
 	ReceiverServerConfig     *xsock.Config
+	RxSocketFileMode         os.FileMode
 }
 
 type Route struct {
@@ -48,6 +50,11 @@ func (r *Route) Start() error {
 
 	rxChan, _, err := r.Rx.Listen(r.Config.ReceiverSocketAddress, r.Config.ReceiverPackBufferSize)
 
+	if err != nil {
+		return err
+	}
+
+	err = os.Chmod(r.Config.ReceiverSocketAddress, r.Config.RxSocketFileMode)
 	if err != nil {
 		return err
 	}

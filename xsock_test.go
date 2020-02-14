@@ -18,8 +18,8 @@ func pusher(name string, msgCount int) {
 	}
 	defer cli.Close()
 
-	for i:= 0; i <= msgCount; i++ {
-		cli.Write([]byte(fmt.Sprintf(" [%d] ", i + 1)))
+	for i := 0; i <= msgCount; i++ {
+		cli.Write([]byte(fmt.Sprintf(" [%d] ", i+1)))
 		cli.Write([]byte(""))
 		cli.Write([]byte(fmt.Sprintf("I am the %s of the ", name)))
 		cli.Write([]byte("hell fire tom"))
@@ -28,9 +28,7 @@ func pusher(name string, msgCount int) {
 
 }
 
-
 func TestServer(t *testing.T) {
-
 
 	socketServer := CreateXSockServer(&Config{
 		ByteBufferSize:   1024,
@@ -38,7 +36,7 @@ func TestServer(t *testing.T) {
 		AutoRemoveSocket: true,
 	})
 
-	segmentChannel, err := socketServer.Listen(sockAddr.Name, 10)
+	segmentChannel, _, err := socketServer.Listen(sockAddr.Name, 10)
 
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +45,7 @@ func TestServer(t *testing.T) {
 	// Start receiver
 	go func() {
 		for {
-			segment := <- segmentChannel
+			segment := <-segmentChannel
 			fmt.Printf("Segment: %s\n", segment)
 		}
 	}()
@@ -63,4 +61,22 @@ func TestServer(t *testing.T) {
 	// Wait 5 seconds to completion
 	time.Sleep(time.Second * 5)
 
+}
+
+func TestPullServer(t *testing.T) {
+	socketServer := CreateXSockServer(&Config{
+		ByteBufferSize:   1024,
+		ETXCode:          0x03,
+		AutoRemoveSocket: true,
+	})
+
+	segmentChannel, _, err := socketServer.Listen(sockAddr.Name, 10)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for {
+		log.Printf("%s", <-segmentChannel)
+	}
 }

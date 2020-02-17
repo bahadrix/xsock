@@ -74,7 +74,7 @@ func (r *Route) Start() error {
 func (r *Route) rxCycle(rxChan <-chan []byte) {
 	for {
 		pack := <-rxChan
-
+		continue
 		select {
 		case r.PackBuffer <- pack:
 			if r.isDropping {

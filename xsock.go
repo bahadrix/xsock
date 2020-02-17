@@ -20,7 +20,7 @@ type Server struct {
 }
 
 type ListenerController struct {
-	listener *net.UnixListener
+	listener  *net.UnixListener
 	isClosing bool
 }
 
@@ -95,7 +95,7 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 		return nil, nil, err
 	}
 
-	lcont := &ListenerController{listener:l}
+	lcont := &ListenerController{listener: l}
 
 	go func() {
 		for {
@@ -105,7 +105,8 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 				if lcont.isClosing {
 					break
 				}
-				log.Printf("Error on accepting connection: %v", err)
+				log.Printf("Skipping connection request. Cause: %v", err)
+				break
 			}
 			go s.connectionHandler(conn, &resultChan)
 
@@ -114,4 +115,3 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 
 	return resultChan, lcont, nil
 }
-

@@ -62,18 +62,18 @@ func (r *Route) Start() error {
 	go r.txCycle()
 	log.Println("TX cycle started")
 
+	go r.rxCycle(rxChan)
+	log.Println("RX cycle starting")
+
 	go r.statsCycle()
 	log.Println("Stats cycle started")
-
-	log.Println("RX cycle starting")
-	r.rxCycle(&rxChan)
 
 	return nil
 }
 
-func (r *Route) rxCycle(rxChan *chan []byte) {
+func (r *Route) rxCycle(rxChan <-chan []byte) {
 	for {
-		pack := <-*rxChan
+		pack := <-rxChan
 
 		select {
 		case r.PackBuffer <- pack:

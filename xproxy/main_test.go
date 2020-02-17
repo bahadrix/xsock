@@ -22,6 +22,7 @@ func TestRoute(t *testing.T) {
 		TransmitterSocketAddress: txSockAddr,
 		RoutePackBufferSize:      10,
 		ReceiverPackBufferSize:   2,
+		RxSocketFileMode:         0777,
 		ReceiverServerConfig: &xsock.Config{
 			ByteBufferSize:   1024,
 			ETXCode:          0x03,
@@ -29,29 +30,32 @@ func TestRoute(t *testing.T) {
 		},
 	})
 
-	node := xsock.CreateXSockServer(&xsock.Config{
-		ByteBufferSize:   1024,
-		ETXCode:          0x03,
-		AutoRemoveSocket: true,
-	})
+	err := route.Start()
+	if err != nil {
+		t.Error(err)
+	}
 
-	go func() {
-		err := route.Start()
-		if err != nil {
-			t.Error(err)
-		}
-	}()
 	time.Sleep(time.Second)
 
 	// Publisher node
 	sampleCount := route.Config.RoutePackBufferSize * 250
-	err := sendSample(MSG, rxSockAddr, sampleCount, 0*time.Second)
+	err = sendSample(MSG, rxSockAddr, sampleCount, 0*time.Second)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Published %d messages", sampleCount)
 
 	assert.Nil(t, err)
 	assert.Equal(t, true, route.isDropping)
 	assert.Equal(t, uint(sampleCount-route.Config.RoutePackBufferSize), route.dropCount)
 
 	// Subscriber node
+	node := xsock.CreateXSockServer(&xsock.Config{
+		ByteBufferSize:   1024,
+		ETXCode:          0x03,
+		AutoRemoveSocket: true,
+	})
+
 	nodeChan, _, err := node.Listen(txSockAddr, 10)
 	log.Print("Subscriber1 started to listen")
 	if err != nil {
@@ -61,8 +65,8 @@ func TestRoute(t *testing.T) {
 	assert.Equal(t, route.Config.RoutePackBufferSize, len(route.PackBuffer), "Pack buffer must be full")
 
 	for i := 1; i <= route.Config.RoutePackBufferSize; i++ {
-		log.Printf("A %d/%d", i, route.Config.RoutePackBufferSize)
 		pack := <-nodeChan
+		log.Printf("A %d/%d", i, route.Config.RoutePackBufferSize)
 		assert.Equal(t, MSG, string(pack))
 	}
 

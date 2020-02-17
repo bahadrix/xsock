@@ -45,6 +45,7 @@ func main() {
 	config.RxSocketFileMode = os.FileMode(fmod)
 	route := CreateRoute(config)
 
+	// Print banner
 	fmt.Println(XPROXY_LOGO)
 	fmt.Println("Diff dash: SIGMA")
 	fmt.Printf("BUILD: %s\n", BUILD_HASH)
@@ -54,13 +55,12 @@ func main() {
 	_ = json.Indent(&configJsonPretty, configJson, "", "    ")
 	fmt.Printf("Config:\n%s\n\n", configJsonPretty.Bytes())
 
-	go func() {
-		err := route.Start()
+	// Start server
+	err := route.Start()
 
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, os.Interrupt, syscall.SIGTERM, syscall.SIGKILL)

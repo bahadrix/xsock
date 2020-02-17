@@ -105,10 +105,10 @@ func (r *Route) txCycle() {
 		for {
 			_, err := conn.Write(pack)
 			if err == nil {
-				if conn != nil {
-					conn.Close()
-				}
 				break
+			} else if conn != nil {
+				log.Println("Closing zombie connection")
+				conn.Close()
 			}
 			// Got write error retry connection
 			conn = r.obtainTxConnection()

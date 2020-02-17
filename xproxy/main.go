@@ -47,7 +47,7 @@ func main() {
 
 	// Print banner
 	fmt.Println(XPROXY_LOGO)
-	fmt.Println("Diff dash: SIGMA")
+	fmt.Println("Diff dash: ALPHA")
 	fmt.Printf("BUILD: %s\n", BUILD_HASH)
 
 	configJson, _ := json.Marshal(config)

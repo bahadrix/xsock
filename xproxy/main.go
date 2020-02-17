@@ -43,7 +43,7 @@ func main() {
 	config.RxSocketFileMode = os.FileMode(fmod)
 	route := CreateRoute(config)
 
-	println(XPROXY_LOGO)
+	fmt.Println(XPROXY_LOGO)
 	fmt.Printf("BUILD: %s\n", BUILD_HASH)
 
 	go func() {

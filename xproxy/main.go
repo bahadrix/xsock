@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/bahadrix/xsock"
@@ -45,6 +47,11 @@ func main() {
 
 	fmt.Println(XPROXY_LOGO)
 	fmt.Printf("BUILD: %s\n", BUILD_HASH)
+
+	configJson, _ := json.Marshal(config)
+	var configJsonPretty bytes.Buffer
+	_ = json.Indent(&configJsonPretty, configJson, "", "    ")
+	fmt.Printf("Config:\n%s\n\n", configJsonPretty.Bytes())
 
 	go func() {
 		err := route.Start()

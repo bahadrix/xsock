@@ -106,7 +106,7 @@ func (s *Server) Listen(socketAddress string, channelBufferSize int) (chan []byt
 					break
 				}
 				log.Printf("Skipping connection request. Cause: %v", err)
-				break
+				continue
 			}
 			go s.connectionHandler(conn, &resultChan)
 

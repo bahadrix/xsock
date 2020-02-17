@@ -73,22 +73,24 @@ func (r *Route) Start() error {
 
 func (r *Route) rxCycle(rxChan *chan []byte) {
 	for {
-		pack := <-*rxChan
-		select {
-		case r.PackBuffer <- pack:
-			if r.isDropping {
-				r.isDropping = false
-				log.Printf("State recovered. Packages started to send. %d packages dropped.", r.dropCount)
-				r.dropCount = 0
-			}
+		go func(pack []byte) {
+			select {
+			case r.PackBuffer <- pack:
+				if r.isDropping {
+					r.isDropping = false
+					log.Printf("State recovered. Packages started to send. %d packages dropped.", r.dropCount)
+					r.dropCount = 0
+				}
 
-		default:
-			r.dropCount++
-			if !r.isDropping {
-				r.isDropping = true
-				log.Printf("Route buffer is full. Packages started to drop.")
+			default:
+				r.dropCount++
+				if !r.isDropping {
+					r.isDropping = true
+					log.Printf("Route buffer is full. Packages started to drop.")
+				}
 			}
-		}
+		}(<-*rxChan)
+
 	}
 }
 

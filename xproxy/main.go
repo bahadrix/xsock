@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"github.com/bahadrix/xsock"
 	"log"
 	"os"
@@ -41,6 +42,9 @@ func main() {
 	receiverConfig.ETXCode = uint8(etx)
 	config.RxSocketFileMode = os.FileMode(fmod)
 	route := CreateRoute(config)
+
+	println(XPROXY_LOGO)
+	fmt.Printf("BUILD: %s\n", BUILD_HASH)
 
 	go func() {
 		err := route.Start()

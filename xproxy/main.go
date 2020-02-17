@@ -46,6 +46,7 @@ func main() {
 	route := CreateRoute(config)
 
 	fmt.Println(XPROXY_LOGO)
+	fmt.Println("Diff dash: SIGMA")
 	fmt.Printf("BUILD: %s\n", BUILD_HASH)
 
 	configJson, _ := json.Marshal(config)

@@ -73,24 +73,23 @@ func (r *Route) Start() error {
 
 func (r *Route) rxCycle(rxChan *chan []byte) {
 	for {
-		go func(pack []byte) {
-			select {
-			case r.PackBuffer <- pack:
-				if r.isDropping {
-					r.isDropping = false
-					log.Printf("State recovered. Packages started to send. %d packages dropped.", r.dropCount)
-					r.dropCount = 0
-				}
+		pack := <-*rxChan
 
-			default:
-				r.dropCount++
-				if !r.isDropping {
-					r.isDropping = true
-					log.Printf("Route buffer is full. Packages started to drop.")
-				}
+		select {
+		case r.PackBuffer <- pack:
+			if r.isDropping {
+				r.isDropping = false
+				log.Printf("State recovered. Packages started to send. %d packages dropped.", r.dropCount)
+				r.dropCount = 0
 			}
-		}(<-*rxChan)
 
+		default:
+			r.dropCount++
+			if !r.isDropping {
+				r.isDropping = true
+				log.Printf("Route buffer is full. Packages started to drop.")
+			}
+		}
 	}
 }
 
@@ -106,6 +105,9 @@ func (r *Route) txCycle() {
 		for {
 			_, err := conn.Write(pack)
 			if err == nil {
+				if conn != nil {
+					conn.Close()
+				}
 				break
 			}
 			// Got write error retry connection

@@ -1,6 +1,8 @@
 package xsock
 
 import (
+	"errors"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -53,11 +55,8 @@ func (s *Server) connectionHandler(conn *net.UnixConn, resultChan *chan []byte) 
 
 		n, _, err := conn.ReadFromUnix(buff)
 		if err != nil {
-			if opErr, ok := err.(*net.OpError); ok {
-				if opErr.Err.Error() == "EOF" {
-					// Maybe the connection is closed
-					break
-				}
+			if errors.Is(err, io.EOF) {
+				break
 			}
 			log.Printf("Message read error: %v", err)
 			break
